@@ -6,7 +6,7 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 package CRC16_CCITT_pkg is
 
     -- Define the CRC polynomial for CCITT
-    constant CRC_POLYNOMIAL : std_logic_vector(15 downto 0) := "1100000000000010";
+    constant CRC_POLYNOMIAL : std_logic_vector(15 downto 0) := "1000100000010001";
 
     -- Procedure to calculate CRC16 CCITT
     procedure calculate_CRC16_CCITT(
