@@ -5,27 +5,26 @@ use IEEE.STD_LOGIC_ARITH.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 package pkg_crc16_ccitt is
-    constant CRC_POLYNOMIAL : std_logic_vector(15 downto 0) := "1000100000010001"; -- x^16 + x^12 + x^5 + 1
-    function compute_crc(data_in: std_logic_vector(7 downto 0)) return std_logic_vector;
+    constant CRC_POLYNOMIAL : std_logic_vector(15 downto 0) := "1000100000010001"; -- 1021h -- x^16 + x^12 + x^5 + 1
+    constant INITIAL_CRC_VALUE : std_logic_vector(15 downto 0) := "1111111111111111"; -- FFFFh
+    function compute_crc(data_in: std_logic_vector(7 downto 0); current_crc: std_logic_vector(15 downto 0)) return std_logic_vector;
 end package pkg_crc16_ccitt;
 
 package body pkg_crc16_ccitt is
-    function compute_crc(data_in: std_logic_vector(7 downto 0)) return std_logic_vector is
-        variable crc_register : std_logic_vector(15 downto 0) := (others => '0');
-        variable data_with_crc : std_logic_vector(23 downto 0);
+    function compute_crc(data_in: std_logic_vector(7 downto 0); current_crc: std_logic_vector(15 downto 0)) return std_logic_vector is
+        variable crc_register : std_logic_vector(15 downto 0) := current_crc; -- Registre CRC actuel
     begin
-        -- Append the data with 16 bits of CRC value
-        data_with_crc := data_in & crc_register;
-
-        -- Perform CRC calculation
-        for i in 0 to 7 loop
-            if data_with_crc(23) = '1' then
-                data_with_crc := data_with_crc xor (CRC_POLYNOMIAL & "0000000000000000");
+        -- Traiter chaque bit des données d'entrée
+        for i in 7 downto 0 loop
+            -- Si le MSB du registre CRC XOR avec le bit de données actuel est '1', XOR avec le polynôme
+            if (crc_register(15) xor data_in(i)) = '1' then
+                crc_register := (crc_register(14 downto 0) & '0') xor CRC_POLYNOMIAL; -- Décalage à gauche et XOR avec le polynôme
+            else
+                crc_register := (crc_register(14 downto 0) & '0'); -- Décalage à gauche sans XOR
             end if;
-            data_with_crc := data_with_crc(22 downto 0) & '0'; -- Shift one bit to the left
         end loop;
 
-        -- Extract the computed CRC value
-        return data_with_crc(15 downto 0);
+        -- Retourner la valeur CRC calculée
+        return crc_register;
     end function compute_crc;
 end package body pkg_crc16_ccitt;
