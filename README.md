@@ -11,3 +11,6 @@ library "Your_library_name";
 use work.pkg_crc16_ccitt.all; or if you rename the package file : use work.name_you_chose.all;
 
 Last Update : 01/08/2023
+
+DECLARE THESE IN DESIGN 
+signal   crc_value								 : std_logic_vector(15 downto 0):= (others => '0');
